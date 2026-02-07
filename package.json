@@ -26,6 +26,7 @@
     "fast-xml-parser": "^4.5.0",
     "grammy": "^1.39.3",
     "node-cron": "^3.0.0",
+    "openai": "^6.18.0",
     "sql.js": "^1.11.0",
     "yahoo-finance2": "^2.14.0"
   },

@@ -60,11 +60,20 @@ export interface MarketStatus {
   nextOpenDescription: string;
 }
 
+export type AIProvider = 'claude' | 'openai' | 'grok';
+
+export interface AIModelConfig {
+  provider: AIProvider;
+  model: string;
+  apiKey: string;
+  baseUrl?: string; // Custom base URL (required for Grok)
+}
+
 export interface AppConfig {
   telegramBotToken: string;
   telegramChatId: string;
-  anthropicApiKey: string;
   newsApiKey: string;
+  aiModel: AIModelConfig;
   dbPath: string;
   cronScheduleMorning: string;
   cronScheduleEvening: string;

@@ -7,7 +7,7 @@ A Telegram bot that sends curated, AI-verified news summaries twice daily coveri
 - **Crypto Updates**: BTC price (USD & INR) + top 5 verified crypto news from CoinDesk, CoinTelegraph, CryptoCompare, and Google News
 - **Indian Stock Market**: Live/closing prices for TCS, CDSL, HUL, and Gold (GOLDBEES ETF) + up to 10 market news items from Moneycontrol, Economic Times, LiveMint, NewsAPI, and Google News
 - **Geopolitical News**: Top 5 international news from BBC World, Al Jazeera, NewsAPI, and Google News
-- **AI Verification**: Every news item is verified by Claude AI before being sent - clickbait and unreliable items are filtered out
+- **Multi-Model AI Verification**: Choose between Claude, OpenAI (GPT-4o), or Grok (xAI) for news verification - clickbait and unreliable items are filtered out
 - **Deduplication**: SHA-256 based deduplication via SQLite prevents repeated news across runs
 - **Smart Scheduling**: Sends at 10:00 AM and 8:00 PM IST daily, with reduced content on weekends
 - **Market Awareness**: Detects if Indian stock market is open/closed/weekend and adjusts messaging
@@ -28,7 +28,7 @@ Cron (10AM/8PM IST) or --test-send
      Deduplication (SQLite SHA-256)
             |
             v
-     AI Verification (Claude API - single batch call)
+     AI Verification (Claude / OpenAI / Grok - single batch call)
             |
             v
      Telegram Sender (HTML format, auto-split at 4096 chars)
@@ -51,10 +51,22 @@ Cron (10AM/8PM IST) or --test-send
 2. Send `/start` to it
 3. It will reply with your Chat ID (a number like `123456789`)
 
-### 3. Anthropic API Key
+### 3. AI Provider API Key (choose one)
+
+**Claude (Anthropic)** - Default
 1. Go to [console.anthropic.com](https://console.anthropic.com/)
 2. Create an account or sign in
 3. Navigate to **API Keys** and create a new key
+
+**OpenAI**
+1. Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+2. Create an account or sign in
+3. Create a new API key
+
+**Grok (xAI)**
+1. Go to [console.x.ai](https://console.x.ai/)
+2. Create an account or sign in
+3. Create a new API key
 
 ### 4. NewsAPI Key
 1. Go to [newsapi.org/register](https://newsapi.org/register)
@@ -83,8 +95,13 @@ Cron (10AM/8PM IST) or --test-send
    ```
    TELEGRAM_BOT_TOKEN=your_bot_token
    TELEGRAM_CHAT_ID=your_chat_id
-   ANTHROPIC_API_KEY=your_anthropic_key
    NEWS_API_KEY=your_newsapi_key
+
+   # Choose your AI provider: claude, openai, or grok
+   AI_PROVIDER=claude
+   ANTHROPIC_API_KEY=your_anthropic_key
+   # OPENAI_API_KEY=your_openai_key      # if AI_PROVIDER=openai
+   # XAI_API_KEY=your_xai_key            # if AI_PROVIDER=grok
    ```
 
 4. **Test the bot**
@@ -127,8 +144,20 @@ npm start
 |----------|----------|-------------|
 | `TELEGRAM_BOT_TOKEN` | Yes | Bot token from @BotFather |
 | `TELEGRAM_CHAT_ID` | Yes | Your personal Telegram chat ID |
-| `ANTHROPIC_API_KEY` | Yes | Anthropic API key for news verification |
 | `NEWS_API_KEY` | Yes | NewsAPI.org key for additional news sources |
+| `AI_PROVIDER` | No | `claude` (default), `openai`, or `grok` |
+| `AI_MODEL` | No | Override model name (e.g., `gpt-4o-mini`, `grok-3`) |
+| `ANTHROPIC_API_KEY` | If claude | Anthropic API key |
+| `OPENAI_API_KEY` | If openai | OpenAI API key |
+| `XAI_API_KEY` | If grok | xAI API key |
+
+### Supported Models
+
+| Provider | Default Model | Other Options |
+|----------|---------------|---------------|
+| `claude` | `claude-sonnet-4-20250514` | `claude-opus-4-20250514`, `claude-haiku-4-20250414` |
+| `openai` | `gpt-4o` | `gpt-4o-mini`, `gpt-4.1`, `gpt-4.1-mini`, `o3-mini` |
+| `grok` | `grok-3-mini-fast` | `grok-3`, `grok-3-fast`, `grok-3-mini` |
 
 ## Docker Deployment
 
@@ -168,8 +197,9 @@ If you have [Coolify](https://coolify.io/) installed on your server, follow thes
 - Add each environment variable:
   - `TELEGRAM_BOT_TOKEN` = your bot token
   - `TELEGRAM_CHAT_ID` = your chat ID
-  - `ANTHROPIC_API_KEY` = your Anthropic key
   - `NEWS_API_KEY` = your NewsAPI key
+  - `AI_PROVIDER` = `claude`, `openai`, or `grok`
+  - Plus the corresponding API key (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `XAI_API_KEY`)
 
 ### 5. Set Up Persistent Storage
 - Go to the **Storages** tab
@@ -192,14 +222,16 @@ If you have [Coolify](https://coolify.io/) installed on your server, follow thes
 
 1. **Collection**: At scheduled times, three collectors run in parallel fetching news from RSS feeds, APIs, and Google News
 2. **Deduplication**: Each news item is hashed (SHA-256 of URL + title) and checked against a SQLite database. Previously sent items are skipped
-3. **Verification**: All new items are sent to Claude AI in a single API call. Items rated as clickbait, unreliable, or fabricated are filtered out
+3. **Verification**: All new items are sent to your chosen AI (Claude, OpenAI, or Grok) in a single API call. Items rated as clickbait, unreliable, or fabricated are filtered out
 4. **Formatting**: Remaining items are formatted as an HTML Telegram message with sections for crypto, stocks, and geopolitical news
 5. **Sending**: If the message exceeds Telegram's 4096 character limit, it's split at section boundaries and sent as multiple messages
 6. **Cleanup**: Database entries older than 7 days are automatically removed
 
 ## Cost
 
-- **Claude API**: ~$0.002 per run (~$0.12/month for twice-daily runs)
+- **Claude Sonnet**: ~$0.002 per run (~$0.12/month)
+- **OpenAI GPT-4o**: ~$0.003 per run (~$0.18/month)
+- **Grok 3 Mini Fast**: ~$0.001 per run (~$0.06/month)
 - **All other APIs**: Free tier
 
 ## License

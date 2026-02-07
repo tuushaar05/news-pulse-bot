@@ -11,7 +11,7 @@ import { NewsItem, VerifiedNewsItem } from './types/index';
 import { log } from './utils/helpers';
 
 const dedup = new DeduplicationService(config.dbPath);
-const verifier = new VerifierService(config.anthropicApiKey);
+const verifier = new VerifierService(config.aiModel);
 const sender = new TelegramSender(config.telegramBotToken, config.telegramChatId);
 const bot = sender.getBot();
 
@@ -36,6 +36,7 @@ bot.command('health', async (ctx) => {
       `📨 Last send: ${lastSend}`,
       `🗄️ DB entries: ${stats.total} total, ${stats.today} today`,
       `⏰ Schedule: ${config.cronScheduleMorning} & ${config.cronScheduleEvening} (${config.timezone})`,
+      `🤖 AI: ${config.aiModel.provider} (${config.aiModel.model})`,
       `🟢 Node: ${process.version}`,
     ].join('\n'),
   );
@@ -87,7 +88,7 @@ async function runNewsPipeline(): Promise<void> {
     let verifiedItems: VerifiedNewsItem[] = [];
 
     if (allNewNews.length > 0) {
-      log('info', `Verifying ${allNewNews.length} news items with Claude...`);
+      log('info', `Verifying ${allNewNews.length} news items with ${config.aiModel.provider} (${config.aiModel.model})...`);
       verifiedItems = await verifier.verifyNews(allNewNews);
     } else {
       log('info', 'No new news items to verify');
