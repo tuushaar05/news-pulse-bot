@@ -1,0 +1,35 @@
+{
+  "name": "news-pulse-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot that sends curated, verified news summaries twice daily covering crypto, Indian stocks, and geopolitical news.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test-send": "tsx src/index.ts --test-send"
+  },
+  "keywords": ["telegram", "bot", "news", "aggregator", "crypto", "stocks"],
+  "author": "Tuushaar",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "axios": "^1.7.0",
+    "sql.js": "^1.11.0",
+    "dotenv": "^16.4.0",
+    "fast-xml-parser": "^4.5.0",
+    "grammy": "^1.31.0",
+    "node-cron": "^3.0.0",
+    "yahoo-finance2": "^2.14.0"
+  },
+  "devDependencies": {
+    "@types/sql.js": "^1.4.0",
+    "@types/node": "^22.0.0",
+    "@types/node-cron": "^3.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
