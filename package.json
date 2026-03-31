@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "axios": "^1.7.0",
+    "axios": "1.14.0",
     "dotenv": "^16.4.0",
     "fast-xml-parser": "^4.5.0",
     "grammy": "^1.39.3",
@@ -39,5 +39,8 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "overrides": {
+    "axios": "1.14.0"
   }
 }
